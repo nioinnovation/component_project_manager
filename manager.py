@@ -14,8 +14,6 @@ from niocore.util.environment import NIOEnvironment
 from nio import discoverable
 
 from .handler import ProjectManagerHandler
-
-import pip
 import os.path
 
 
@@ -288,8 +286,17 @@ class ProjectManager(CoreComponent):
         if not os.path.isfile(path_req):
             return True
 
+        try:
+
+            # Change directory to block
+            chdir(path_to_block)
+
+        except FileNotFoundError:
+            self.logger.error("Path '{0}' is invalid".format(path_to_block))
+            raise
+
         # Pip install
-        res = pip.main(["install", "-r", path_req])
+        res = self._subprocess_call("pip3 install -r requirements.txt")
         if res != 0:
             return False
 
