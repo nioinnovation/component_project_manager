@@ -7,6 +7,7 @@ import subprocess
 from os import listdir, path, remove, chdir, popen
 from shutil import rmtree
 from urllib.parse import urlparse, urlunparse
+from copy import deepcopy
 
 from nio.modules.persistence import Persistence
 from nio.util.logging import get_nio_logger
@@ -120,7 +121,8 @@ class ProjectManager(CoreComponent):
         if not self._blocks_from:
             self.logger.debug("No blocks to clone")
 
-        for block in self._blocks_from.get('blocks'):
+        # perform a deepcopy since clone_block might modify collection
+        for block in deepcopy(self._blocks_from.get('blocks')):
             repo, tag, branch, path_to_block = self._parse_block(block)
             # Clone the repo with the configured branch. If the block already
             # exists in this project then it will NOT be overwritten and the
